@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <table>
+        <tr valign="top">
+            <td>
+                <p>Date: {{ moment(asset_update.timestamp).format('LLL')}}</p>
+                <p>Asset: {{ asset.asset_name }}</p>
+                
+                <p>Title: {{ asset_update.asset_update_title }}</p>
+                <p>Content: {{ asset_update.asset_update_content }}</p>
+            </td>
+        </tr>
+    </table>
+
+{% endblock %}

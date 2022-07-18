@@ -1,5 +1,16 @@
 form textarea#asset_thesis {
-    width: 320px;
+    width: 400px;
     height: 200px;
-    max-width: 400px;
 }
+
+form textarea {
+    width: 400px;
+    height: 200px;
+    max-width: auto;
+}
+
+/* form select {
+    width: 320px;
+    height: 20px;
+    max-width: 400px;
+} */

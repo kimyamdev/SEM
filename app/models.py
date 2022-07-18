@@ -10,7 +10,6 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    asset_updates = db.relationship('Asset_Update', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -34,18 +33,18 @@ class Asset(db.Model):
     asset_thesis = db.Column(db.String(1200), index=True, unique=True)
     asset_type = db.Column(db.String(140))
     asset_class = db.Column(db.String(140))
-    # asset_updates = db.relationship('Asset_Update', backref='asset', lazy='dynamic')
 
     def __repr__(self):
         return '<Asset {}>'.format(self.asset_name)
 
 class Asset_Update(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    asset = db.Column(db.String(140))
     asset_update_title = db.Column(db.String(140))
-    asset_update_content = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    asset_update_content = db.Column(db.String(2000))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship(User, backref='asset_updates')
     asset_id = db.Column(db.Integer, db.ForeignKey('asset.id'))
+    asset = db.relationship(Asset, backref='asset_updates')
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     def __repr__(self):

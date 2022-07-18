@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block app_content %}
     <h1>Hi {{ current_user.username }},</h1>
 
     <h3>These are the assets we are actively researching / investing in. 
@@ -17,11 +17,20 @@
 
     <h3>Latest updates:</h3>
     
+    
     {% for asset_update in asset_updates %}
 
+    {{ asset_update }}
+    {{ asset_update.asset.asset_name }}
+    {{ asset_update.asset_update_title }}
+    {{ asset_update.asset_update_content }}
+    {{ asset_update.timestamp }}
+
     <div>
-        <p><a href="">{{ asset_update.asset_update_title }}</a></b></p>
+        <p> {{ moment(asset_update.timestamp).format('LLL') }} - {{ asset_update.asset.asset_name }} -
+        <a href="{{ url_for('asset_update_detail', asset_name=asset_update.asset.asset_name, asset_update_title=asset_update.asset_update_title) }}">{{ asset_update.asset_update_title }}</a></p>
     </div>
 
     {% endfor %}
+
 {% endblock %}

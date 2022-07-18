@@ -45,12 +45,12 @@ class EditProfileForm(FlaskForm):
 class CreateAssetForm(FlaskForm):
     asset_name = StringField('Asset')
     asset_thesis = TextAreaField('Asset Thesis')
-    asset_type = StringField('Asset Type')
-    asset_class = StringField('Asset Class')
+    asset_type = SelectField('Asset Type')
+    asset_class = SelectField('Asset Class')
     submit = SubmitField('Create Asset')
 
 class CreateAssetUpdateForm(FlaskForm):
-    asset = SelectField('Asset', coerce=int, validators=[DataRequired()])
+    asset_id = SelectField(u'Asset', coerce=int, validators=[DataRequired()])
     asset_update_title = StringField('Asset Update Title')
     asset_update_content = TextAreaField('Asset Update Content')
     submit = SubmitField('Create Asset Update')

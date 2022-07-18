@@ -1,21 +1,20 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, session
 from werkzeug.urls import url_parse
 from datetime import datetime
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, CreateAssetForm, CreateAssetUpdateForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Asset, Asset_Update
-
-
+from sqlalchemy import desc
 
 @app.route('/')
 @app.route('/index')
 @login_required
 def index():
     assets = Asset.query.all()
-    asset_updates = Asset_Update.query.all().order_by(Asset_Update.timestamp)
-    return render_template('index.html', title='Home', assets=assets, asset_updates=asset_updates)
+    asset_updates = Asset_Update.query.order_by(desc(Asset_Update.timestamp)).limit(10).all()
 
+    return render_template('index.html', title='Home', assets=assets, asset_updates=asset_updates)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -95,11 +94,20 @@ def asset(asset_name):
     ]
     return render_template('asset.html', asset=asset, asset_updates=asset_updates)
 
+@app.route('/asset_update/<asset_name>/<asset_update_title>')
+@login_required
+def asset_update_detail(asset_name, asset_update_title):
+    asset_update = Asset_Update.query.filter_by(asset_update_title = asset_update_title).first_or_404()
+    asset = Asset.query.filter_by(asset_name = asset_name).first_or_404()
+    return render_template('asset_update_detail.html', asset=asset, asset_update=asset_update)
+
 @app.route('/create_asset', methods=['GET', 'POST'])
 def create_asset():
     # if current_user!=1:
     #     return redirect(url_for('index'))
     form = CreateAssetForm()
+    form.asset_type.choices = [(1, "Direct Equities"), (2, "Direct Bonds"), (3, "Equity ETF"), (4, "Bonds ETF")]
+    form.asset_class.choices = [(1, "Growth Equities"), (2, "Value Equities"), (3, "Fixed Income Fixed Rate"), (4, "Fixed Income Floating Rate"), (5, "Convertible Bonds")]
     if form.validate_on_submit():
         asset = Asset(asset_name=form.asset_name.data, asset_thesis=form.asset_thesis.data, asset_type=form.asset_thesis.data, asset_class=form.asset_class.data)
         db.session.add(asset)
@@ -117,9 +125,9 @@ def create_asset_update():
     available_assets = db.session.query(Asset).all()
     assets_list = [(i.id, i.asset_name) for i in available_assets]
     form = CreateAssetUpdateForm()
-    form.asset.choices = assets_list
+    form.asset_id.choices = assets_list
     if form.validate_on_submit():
-        asset_update = Asset_Update(asset=form.asset.data, asset_update_title=form.asset_update_title.data, asset_update_content=form.asset_update_content.data)
+        asset_update = Asset_Update(asset_id=form.asset_id.data, asset_update_title=form.asset_update_title.data, asset_update_content=form.asset_update_content.data, timestamp=datetime.utcnow())
         db.session.add(asset_update)
         db.session.commit()
         flash('Congratulations, you have just created a new asset update!')
